@@ -1,0 +1,31 @@
+ColNumber,VarName,
+1,X,Rownumber
+2,Plot,Plot number
+3,MT_RBR_MEAN,"RBR fire severity mean, not sure what layer this is from"
+4,MT_Canopy_Damage_Percent_MEAN,"Canopy damage percentage, almost certainly Tukman's layers"
+5,MT_Soil_Burn_Severity_MEAN,Soil Burn Severity - a federal project I'm pretty sure?
+6,UTM_E,UTM east location
+7,UTM_N,UTM north location
+8,Slope,Plot slope
+9,Aspect,Plot aspect
+10,Super_Plot,Super plot designation (1=yes)
+11,vegplots,not sure - goes from 0-49 and doesn't include new 2018 plots
+12,X_1,UTM east location again
+13,Y,UTM north location again
+14,RBR,RBR fire severity - not same as RBR mean in column 3  - is this Matt Clark layer?
+15,dNBR,dNBR fire severity - not same as col 3 - is this Matt Clark layer?
+16,NBR_170925,raw NBR pre fire - not sure source
+17,NBR_171027,raw NBR post fire - not sure source
+18,plot.scorch,weighted mean plot scorch from post-fire surveys
+19,TR.weighted.mean,
+20,SA.weighted.mean,
+21,TR_dead,
+22,TR_topkill_.bsprout,
+23,TR_crown_bsprout,
+24,TR_live.crown,
+25,TR_total,
+26,SA_dead,
+27,SA_topkill_.bsprout,
+28,SA_crown_bsprout,
+29,SA_live.crown,
+30,SA_total,
