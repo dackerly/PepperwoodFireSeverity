@@ -1,6 +1,7 @@
 ## compare field scorch with remote sensing
 
-fs <- read.csv('/Users/david/Google Drive/Drive-Projects/Pepperwood/Fire_2017/Post-fire-field-projects/Pepperwood-Fire-Rapid-Surveys/Post-fire-plot-surveys/plot-scorch-data-combined.csv',as.is=T)
+getwd()
+fs <- read.csv('/Volumes/Google Drive/My Drive/My_Drive_Cloud/Drive-Projects/Pepperwood/Fire_2017/Post-fire-field-projects/Pepperwood-Fire-Rapid-Surveys/Post-fire-plot-surveys/plot-scorch-data-combined.csv',as.is=T)
 head(fs)
 tail(fs)
 
@@ -50,7 +51,7 @@ boxplot(md$Canopy_Damage_Percent_MEAN~md$NPSBurnSevVegetation)
 
 
 # now look at all Tukman's data
-rs <- read.csv('/Users/david/Google Drive/Drive-Projects/Pepperwood/Fire_2017/Tukman_rs_damage/Pepperwood_Plots_Canopy_Damage_Polygons.csv',as.is=T)
+rs <- read.csv('/Volumes/Google Drive/My Drive/My_Drive_Cloud/Drive-Projects/Pepperwood/Fire_2017/Tukman_rs_damage/Pepperwood_Plots_Canopy_Damage_Polygons.csv',as.is=T)
 head(rs)
 dim(rs)
 rsamp <- sample(nrow(rs),1000)

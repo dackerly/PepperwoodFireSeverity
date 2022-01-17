@@ -16,6 +16,8 @@ fnames <- c('hectares-18-100m-cpt.csv','vegplots-54-20m-cpt.csv','hectares-18-20
 
 ## NOW EXTRACT FIRE SEVERITY DATA FROM SPATIAL DATA FILES
 ## MTBS - 30m resolution to no reason to do the vegplot quads
+dir('bigdata/mtbs/2017_Tubbs/')
+system('cat bigdata/mtbs/readme.txt')
 
 # Tubbs
 t.rdnbr <- raster('bigdata/mtbs/2017_Tubbs/ca3859812261820171009/ca3859812261820171009_20170707_20180710_rdnbr.tif')
@@ -71,6 +73,8 @@ for (f in 1:3) {
 
 
 # Clark
+system('cat bigdata/Clark/readme.txt')
+
 r <- raster('bigdata/Clark/Tubbs/LC08_CU_001008_20170925_201701027_RBR.tif')
 r
 plot(r)
@@ -104,7 +108,9 @@ for (f in 2:3) {
   write.csv(fs,paste('data/FSextract/ClarkRBR-',substr(fname,126,mx),'.csv',sep=''))
 }
 
-# USFS BARC soil burn severity
+# USFS BARC fire severity
+system('cat bigdata/BARC/Readme.txt')
+
 r <- raster('bigdata/BARC/Tubbs/barc256_s220170927_s220171017_20m.tif')
 r
 plot(r)
@@ -129,9 +135,9 @@ for (f in 1:3) {
   tubbs <- extract(r,cpts)
   
   if (f<3) {
-    fs <- data.frame(Plot=cp$Plot,x=cpts[,1],y=cpts[,2],Tubbs.barc.SBS=tubbs)
+    fs <- data.frame(Plot=cp$Plot,x=cpts[,1],y=cpts[,2],Tubbs.barc.dNBR17=tubbs)
   } else {
-    fs <- data.frame(Plot=cp$Plot,Quad=cp$Quad,x=cpts[,1],y=cpts[,2],Tubbs.barc.SBS=tubbs)
+    fs <- data.frame(Plot=cp$Plot,Quad=cp$Quad,x=cpts[,1],y=cpts[,2],Tubbs.barc.dNBR17=tubbs)
   }
   mx <- 140
   if (f==1) mx <- 141 else if (f==4) mx <- 139
@@ -162,9 +168,9 @@ for (f in 4:4) {
   tubbs <- extract(r2,cpts)
   
   if (f<3) {
-    fs <- data.frame(Plot=cp$Plot,x=cpts[,1],y=cpts[,2],Tubbs.barc.SBS=tubbs)
+    fs <- data.frame(Plot=cp$Plot,x=cpts[,1],y=cpts[,2],Tubbs.barc.dNDVI17=tubbs)
   } else {
-    fs <- data.frame(Plot=cp$Plot,Quad=cp$Quad,x=cpts[,1],y=cpts[,2],Tubbs.barc.SBS=tubbs)
+    fs <- data.frame(Plot=cp$Plot,Quad=cp$Quad,x=cpts[,1],y=cpts[,2],Tubbs.barc.dNDVI17=tubbs)
   }
   mx <- 140
   if (f==1) mx <- 141 else if (f==4) mx <- 139
@@ -172,27 +178,75 @@ for (f in 4:4) {
   write.csv(fs,paste('data/FSextract/BARC5-256-',substr(fname,126,mx),'.csv',sep=''))
   
   # how much variation among plots
-  mval <- tapply(fs$Tubbs.barc.SBS,fs$Plot,min,na.rm=T)
-  mxval <- tapply(fs$Tubbs.barc.SBS,fs$Plot,max,na.rm=T)
-  mnval <- tapply(fs$Tubbs.barc.SBS,fs$Plot,mean,na.rm=T)
+  mval <- tapply(fs$Tubbs.barc.dNDVI17,fs$Plot,min,na.rm=T)
+  mxval <- tapply(fs$Tubbs.barc.dNDVI17,fs$Plot,max,na.rm=T)
+  mnval <- tapply(fs$Tubbs.barc.dNDVI17,fs$Plot,mean,na.rm=T)
+  length(mnval)
   plot(mnval,(mxval-mval))
+  
+  dNDVImean <- tapply(fs$Tubbs.barc.dNDVI17,fs$Plot,mean,na.rm=T)
+  fname <- paste(prefix,fnames[2],sep='')
+  cp54 <- read.csv(text=getURL(fname, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
+  dim(cp54)
+  head(cp54)
+    
+  fs <- data.frame(Plot=cp54$Plot,x=cp54$UTM.x,y=cp54$UTM.y,Tubbs.barc.dNDVImn5=mnval)
+  head(fs)
+  dim(fs)
+  write.csv(fs,paste('data/FSextract/BARC5mn-256-',substr(fname,126,140),'.csv',sep=''))
 }
 
-## COMBINE DATA EXTRACTS
-vpf <- dir('data/FSextract/',pattern = '54-20')
 
-dr <- read.csv(paste('data/FSextract/',vpf[1],sep=''))
-head(dr)
-i=2
-for (i in 2:length(vpf)) 
-{
-  dx <- read.csv(paste('data/FSextract/',vpf[i],sep=''))
-  namehold <- names(dr)
-  dr <- cbind(dr,dx[,-c(1:4)])
-  head(dr)
-  names(dr) <- c(namehold,names(dx)[-c(1:4)])
+# Soil Burn Severity - from Tukman gis files
+system('cat bigdata/SBS/Readme.txt')
+
+r2 <- raster('bigdata/SBS/SoilBurnSeverity/Tubbs_SBS.tif')
+r2
+plot(r2)
+hist(getValues(r2))
+proj4string(r2)
+
+## extract 5 m for veg plot quads and average
+f <- 4
+fname <- paste(prefix,fnames[f],sep='')
+
+cp <- read.csv(text=getURL(fname, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
+head(cp)  
+
+# convert cp to proper projection
+cps <- SpatialPoints(cp[,c('UTM.x','UTM.y')],proj4string=CRS('+proj=utm +zone=10'))
+cps.sptr <- spTransform(cps,CRS(proj4string(r2)))
+cpts <- coordinates(cps.sptr)
+
+plot(r2)
+points(cpts,pch=19,col='red')
+
+tubbs <- extract(r2,cpts)
+
+if (f<3) {
+  fs <- data.frame(Plot=cp$Plot,x=cpts[,1],y=cpts[,2],Tubbs.SBS=tubbs)
+} else {
+  fs <- data.frame(Plot=cp$Plot,Quad=cp$Quad,x=cpts[,1],y=cpts[,2],Tubbs.SBS=tubbs)
 }
-head(dr)
-pairs(dr[,-c(1:4)])
+mx <- 140
+if (f==1) mx <- 141 else if (f==4) mx <- 139
 
- vpf <- dir('data/FSextract/',pattern = '18-20')
+write.csv(fs,paste('data/FSextract/SBS5-256-',substr(fname,126,mx),'.csv',sep=''))
+
+# how much variation among plots
+mval <- tapply(fs$Tubbs.SBS,fs$Plot,min,na.rm=T)
+mxval <- tapply(fs$Tubbs.SBS,fs$Plot,max,na.rm=T)
+mnval <- tapply(fs$Tubbs.SBS,fs$Plot,mean,na.rm=T)
+mnval[is.nan(mnval)] <- NA
+par(mar=c(5,5,1,1))
+plot(mnval,(mxval-mval))
+
+fname <- paste(prefix,fnames[2],sep='')
+cp54 <- read.csv(text=getURL(fname, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))
+head(cp54)
+cp54$SBSmn <- mnval
+head(cp54)
+fs <- data.frame(Plot=cp54$Plot,x=cp54$UTM.x,y=cp54$UTM.y,Tubbs.SBS=mnval)
+head(fs)
+dim(fs)
+write.csv(fs,paste('data/FSextract/SBS5mn-256-',substr(fname,126,140),'.csv',sep=''))
