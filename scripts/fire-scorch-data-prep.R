@@ -71,6 +71,19 @@ tail(dr5m)
 ## compare values sampled at midPlot to those averaged over 16 quads
 names(dr)
 names(dr5m)
+<<<<<<< HEAD
+
+for (i in 2:19) print(cor(dr5m[,i],dr[,i+2],use='pair'))
+# plot lowest correlation
+plot(dr5m[,2],dr[,4])
+plot(dr5m[,16],dr[,18])
+plot(dr5m[,17],dr[,19])
+plot(dr5m[,19],dr[,21])
+
+# combine all data, using qm averages for precision
+fsCols <- sort(c(grep('Tubbs',names(dr5m)),grep('Kincade',names(dr5m))))
+
+=======
 
 for (i in 2:19) print(cor(dr5m[,i],dr[,i+2],use='pair'))
 # plot lowest correlation
@@ -88,6 +101,15 @@ dim(cp)
 
 tcols <- c(which(names(cp)=='plot.scorch'),grep('Tubbs',names(cp)))
 pairs(cp[,tcols[1:7]])
+
+# MTBS RdNBR and dNBR are essentially identical, so picking RdNBR
+# prefer to use continuous over categorical - can always make categorical later
+pairs(cp[,tcols[c(1,2,5:7)]])
+cor(cp[,tcols[c(1,2,5:7)]],use='pair')
+
+# BARC dNBR not well correlated with others - drop for now
+pairs(cp[,tcols[c(1,2,5:6)]])
+cor(cp[,tcols[c(1,2,5:6)]],use='pair')
 
 # MTBS RdNBR and dNBR are essentiallyidentical, so picking RdNBR
 # prefer to use continuous over categorical - can always make categorical later
