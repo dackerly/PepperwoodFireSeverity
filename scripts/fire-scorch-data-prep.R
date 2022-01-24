@@ -18,7 +18,7 @@ fnames <- c('hectares-18-100m-cpt.csv','vegplots-54-20m-cpt.csv','hectares-18-20
 # Read in locations - these are centerpoints
 ## load plot center coordinate data from VegPlots master git repo
 options(stringsAsFactors=FALSE) 
-prefix='https://raw.githubusercontent.com/dackerly/PepperwoodVegPlots/master/2021/2021_updated_shapefiles_and_coordinates/shapefiles/'
+prefix='https://raw.githubusercontent.com/dackerly/PepperwoodVegPlots/master/GIS/2021_updated_shapefiles_and_coordinates/shapefiles/'
 
 fname <- paste(prefix,fnames[2],sep='')
 
@@ -43,41 +43,71 @@ dim(cp)
 dr <- read.csv(paste('data/FSextract/',vpf[1],sep=''))
 dim(dr)
 head(dr)
-i=2
-for (i in 2:length(vpf)) 
-{
-  dx <- read.csv(paste('data/FSextract/',vpf[i],sep=''))
-  print(dim(dx))
-  namehold <- names(dr)
-  dr <- cbind(dr,dx[,-c(1:4)])
-  head(dr)
-  names(dr) <- c(namehold,names(dx)[-c(1:4)])
-}
-head(dr)
-dim(dr)
-tcols <- grep('Tubbs',names(dr))
-pairs(dr[,tcols])
 
-# combine all data
-cp <- cbind(cp,dr[,-c(1:4)])
+names(dr)
+
+fsCols <- sort(c(grep('Tubbs',names(dr)),grep('Kincade',names(dr))))
+
+## Now look at data sampled at 5m quadrats to see how similar
+(vpf <- dir('data/FSextract/',pattern = '54-5'))
+
+dr5 <- read.csv(paste('data/FSextract/',vpf[1],sep=''))
+dim(dr5)
+head(dr5)
+(fsCols5 <- sort(c(grep('Tubbs',names(dr5)),grep('Kincade',names(dr5)))))
+
+dr5m <- data.frame(Plot=dr$Plot)
+names(dr5m)
+
+# check col aligment, for extra 'X' cols created by csv write/read
+names(dr5)
+for (i in 5:22) {
+  dr5m <- cbind(dr5m,tapply(dr5[,i],dr5$Plot,mean,na.rm=T))
+}
+names(dr5m)[2:19] <- paste(names(dr5)[5:22],'qm',sep='.')
+head(dr5m)
+tail(dr5m)
+
+## compare values sampled at midPlot to those averaged over 16 quads
+names(dr)
+names(dr5m)
+
+for (i in 2:19) print(cor(dr5m[,i],dr[,i+2],use='pair'))
+# plot lowest correlation
+plot(dr5m[,2],dr[,4])
+plot(dr5m[,16],dr[,18])
+plot(dr5m[,17],dr[,19])
+plot(dr5m[,19],dr[,21])
+
+# combine all data, using qm averages for precision
+fsCols <- sort(c(grep('Tubbs',names(dr5m)),grep('Kincade',names(dr5m))))
+
+cp <- cbind(cp,dr5m[,fsCols])
 head(cp)
 dim(cp)
 
 tcols <- c(which(names(cp)=='plot.scorch'),grep('Tubbs',names(cp)))
-pairs(cp[,tcols])
-cor(cp[,tcols],use='pair')
+pairs(cp[,tcols[1:7]])
 
+# MTBS RdNBR and dNBR are essentiallyidentical, so picking RdNBR
+# prefer to use continuous over categorical - can always make categorical later
+pairs(cp[,tcols[c(1,2,5:7)]])
+cor(cp[,tcols[c(1,2,5:7)]],use='pair')
+
+# BARC dNBR not well correlated with others - drop for now
+pairs(cp[,tcols[c(1,2,5:6)]])
+cor(cp[,tcols[c(1,2,5:6)]],use='pair')
+
+# check by calculating average correlation of each parameter against the others
 ctable <- cor(cp[,tcols],use='pair')
 apply(ctable,1,mean)
 
-plot(cp$plot.scorch,cp$Tubbs.mtbs.DNBR6,xlim=c(-5,100),ylim=c(-0.1,4.1))
-table(cp$Tubbs.mtbs.DNBR6)
-
-pc <- princomp(cp[1:50,tcols[1:7]],cor = TRUE)
-biplot(pc,xlim=c(-0.3,0.6),ylim=c(-0.4,0.6))
+pc <- princomp(cp[1:50,tcols[c(1,2,6)]],cor = TRUE)
+biplot(pc,xlim=c(-0.3,0.65),ylim=c(-0.4,0.6))
 abline(h=0,lty=2);abline(v=0,lty=2)
 pc$scores[,c(1,2)]
 
-pc2 <- princomp(cp[,tcols[2:7]],cor = TRUE)
+pc2 <- princomp(cp[,tcols[c(2:4,6)]],cor = TRUE)
+pc2
 biplot(pc2,xlim=c(-0.3,0.5),ylim=c(-0.3,0.4))
 abline(h=0,lty=2);abline(v=0,lty=2)
