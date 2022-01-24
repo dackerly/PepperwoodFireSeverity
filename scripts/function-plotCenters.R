@@ -10,7 +10,7 @@ plotCenters <- function(fname='vegplots-54-20m-cpt.csv',plotSize=20)
   cp <- list()
   ## load plot center coordinate data from VegPlots master git repo
   options(stringsAsFactors=FALSE) 
-  prefix='https://raw.githubusercontent.com/dackerly/PepperwoodVegPlots/master/2021/2021_updated_shapefiles_and_coordinates/shapefiles/'
+  prefix='https://raw.githubusercontent.com/dackerly/PepperwoodVegPlots/master/GIS/2021_updated_shapefiles_and_coordinates/shapefiles/'
   
   fn <- paste(prefix,fname,sep='')
   df <- read.csv(text=getURL(fn, followlocation = TRUE, cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl")))

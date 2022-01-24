@@ -32,20 +32,21 @@ library(sp)
   plotSize <- c(100,20,20,5)
   
   # select which infile
-  #f <- 1
-  #outName <- 'vegplots-54-20m-FS.csv'
+  f <- 1
+  outName <- 'vegplots-54-20m-FS.csv'
 
   # select which infile
   #f <- 2
   #outName <- 'hectares-18-20m-FS.csv'
 
   # select which infile
-  f <- 3
-  outName <- 'vegplots-54-5m-FS.csv'
+  #f <- 3
+  #outName <- 'vegplots-54-5m-FS.csv'
   
   # set outfile name
   
   cp <- plotCenters(fname=fnames[f],plotSize=plotSize[f])
+  head(cp)
 }
 
 ## INSERT OTHER CODE HERE FOR OTHER LOCATION DATA
@@ -53,7 +54,7 @@ library(sp)
 
 # showMaps T to examine each raster and check points are properly positioned
 # F for faster processing
-showMaps <- F
+showMaps <- T
 
 # Transfer cp list items to three variables for subsequent use below
 cpdf <- cp[[1]]
@@ -193,3 +194,6 @@ cpdf$Tubbs.BARC.SBS4.5 <- extract(r2,cpts)
 head(cpdf)
 
 write.csv(cpdf,paste('data/FSextract/',outName,sep=''))
+
+names(cpdf)
+pairs(cpdf[,c(10:12,16:21)])
