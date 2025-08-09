@@ -103,6 +103,9 @@ tcols <- c(which(names(cp)=='plot.scorch'),grep('Tubbs',names(cp)))
 names(cp)[tcols]
 pairs(cp[,tcols[1:7]])
 
+plot(cp[tcols[2:3]])
+abline(0,1)
+
 # MTBS RdNBR and dNBR are essentially identical, so picking RdNBR
 # prefer to use continuous over categorical - can always make categorical later
 pairs(cp[,tcols[c(1,2,5:7)]])
